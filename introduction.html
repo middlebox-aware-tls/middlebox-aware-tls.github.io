@@ -94,7 +94,11 @@
 				<div class="row">
 					<div class="col-md-8">
 					    <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session by using private key sharing or custom root certificates
+					    <h4>&#9656 One approach: Private key sharing</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;A middlebox such as web application firewalls previously gets the private key and the corresponding certificate from the server and impersonates the servers, when the client initiates a TLS handshake with the middlebox.
+					    <h4>&#9656 The other approach: Custom root certificate</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;A middlebox such as anti-virus software initially installs the custom root certificate into the client's trusted store and forges the certificate, when the client initiates a TLS handshake with the middlebox
 					</div>
 					<div class="col-md-4">
             An image will be inserted
@@ -120,8 +124,8 @@
 					<div class="col-md-8">
 						  <h4>&#9656 Authentication is a process to confirm the identity of the other point</h4>
           &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-						  <h4>&#9656 Clients cannot authenticate servers with SplitTLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
+						  <h4>&#9656 Clients cannot directly authenticate servers with SplitTLS</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;It is continuously reported that some middleboxes failed to validate invalid certificates and established a valid-looking session with the client.
 					</div>
 				</div>
 			</div>
@@ -132,9 +136,11 @@
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
+						  <h4>&#9656 Confidentiality means that no one between the endpoints can read the messages</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;The TLS session between the client and the server is established with a strong ciphersuite and a key stream is only once used.
+					<h4>&#9656 Clients cannot know the security of the segments after the immediate middlebox</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Some middleboxes are known to advertise weak ciphersuites.
+          </div>
 					<div class="col-md-4">
 						An image will be inserted
 					</div>
@@ -150,13 +156,41 @@
 						An image will be inserted
 					</div>
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+						  <h4>&#9656 Integrity means that no one but the endpoints can modify the messages</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;With the message authentication code (MAC), the unintentially modified messages are detected.
+              <h4>&#9656 Client cannot detect whether the message is modified after the immediate middlebox</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;It is known that some middleboxes insert unwanted messages, some of which are even malicious.
 					</div>
 
 				</div>
 			</div>
     </div>
+  </div>
+
+	<div class="background-white">
+		<div id="causes" class="container">
+			<h2>Main Causes</h2>
+				<p class="lead">
+					The main cause of the problems is because the client has no idea of the involved middleboxes 
+				</p>
+
+			<hr />
+
+      <h3>Two Causes</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-8">
+						  <h4>&#9656 Client cannot be aware of the involved middleboxes</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;With SplitTLS, the client always believes its peer is the intended server.
+
+						  <h4>&#9656 Client is forced to trust behavior of the middleboxes</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Even if the middlebox incorrectly behaves or violates the client's policy, there is no way for the client to detect it.
+					</div>
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+				</div>
+			</div>
   </div>
 </body>
 </html>

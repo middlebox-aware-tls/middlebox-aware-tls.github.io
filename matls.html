@@ -66,35 +66,48 @@
 
 		<div class="background-white">
 			<div id="introduction" class="container">
-				<h2>Introduction</h2>
-        <p class="lead">In general, TLS cannot be compatible with middleboxes,<br> 
-        since the TLS protocol prohibits man-in-the-middle attacks</p>
+				<h2>Security Goals</h2>
+        <p class="lead">We extend three main goals -- Authentication, Confidentiality, and Integrity -- that TLS provides to seven goals for maTLS</p>
       <hr />
-      <h3>TLS with Middleboxes</h3>
+      <h3>Authentication</h3>
 
       <div class="row">
         <div class="col-md-4">
           An image will be inserted
         </div>
         <div class="col-md-8">
-          <h4>&#9656 Middleboxes are widely used</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes such as anti-virus software and a firewall are widely used to enhance security and performance in networking.
+          <h4>&#9656 Server authentication</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The server should be authenticated with their certificate by the client. This prevents the client or the middlebox from establishing the session with the unintended or mistaken entity.
         
-          <h4>&#9656 TLS does not allow a man-in-the-middle</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;TLS is an end-to-end security protocol; thus, TLS does not permit middleboxes to be involved in the session.
-
-          <h4>&#9656 Middleboxes cannot be used with TLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes that should read application data become dumb with TLS.
+          <h4>&#9656 Middlebox authentication</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The middleboxes should be authenticated with their certificate by the client. Now the client can figure out what middleboxes are involved in the session, with their information.
         </div>
       </div>
 
       <hr />
 
-      <h3>SplitTLS is risky</h3>
+      <h3>Confidentiality</h3>
 				<div class="row">
 					<div class="col-md-8">
-					    <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+					    <h4>&#9656 Segment Secrecy</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; All the segment should be "encrypted" with "strong ciphersuites". This guarantees the level of the security of the session and the client can abort the connection according to their policy.
+					    <h4>&#9656 Individual Secrecy</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; All the segment should be "individually" established with their own security association (i.e., a segment key and a ciphersuite). This prevents the session from using the same key stream across the segments, which might undermine the confidentiality. Also, the ciphersuites can be determined flexibly without any restriction. For example, some schemes determine the ciphersuite among the "intersection" of the ciphersuites that all the entities support.
+					</div>
+					<div class="col-md-4">
+            An image will be inserted
+					</div>
+				</div>
+
+      <h3>Integrity</h3>
+				<div class="row">
+					<div class="col-md-8">
+					    <h4>&#9656 Data source authentication</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client should be able to confirm the source of the received message. This feature aims to guarantee only authorized entities, such as the server or the web cache, can generate the message.
+					    <h4>&#9656 Modification accountability</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client should be able to confirm which middlebox modified the received message. This feature makes the write operation in the session visible to the client and mitigates any attempt by the malicious middlebox to insert any unwanted message, since this will be disclosed.
+					    <h4>&#9656 Path integrity</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client should be able to confirm that the received message has passed through the established order of the middleboxes. If the order is changed, it may incur unintended side effects. For example, let assume the anonymizer comes before the firewall, expecting the anonymizer hides any sensitive information and the firewall performs its functionality over the anonymized message. Then, the sensitive information will be leaked to the firewall if the order is reversed.
 					</div>
 					<div class="col-md-4">
             An image will be inserted
@@ -104,36 +117,36 @@
 		</div>	
 		
 		<div id="problems" class="container">
-			<h2>Problems</h2>
-				<p class="lead">
-					The current TLS-interception scheme (a.k.a. SplitTLS) is risky in terms of authentication, confidentiality, and integrity, which are guaranteed by the TLS protocol
-				</p>
+			<h2>Session Esablishment Approach</h2>
+				<p class="lead">maTLS adopts the bottom-up approach for increment deployment and individual secrecy</p>
 
 			<hr />
 
-      <h3>Authentication</h3>
+      <h3>Top-down v.s. Bottom-up</h3>
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-4">
 						An image will be inserted
 					</div>
 					<div class="col-md-8">
-						  <h4>&#9656 Authentication is a process to confirm the identity of the other point</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-						  <h4>&#9656 Clients cannot authenticate servers with SplitTLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
+						  <h4>&#9656 The session is established first, then the middleboxes are involved in the top-down approach</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; In the top-down approach, the session is established between the client and the server and then authorized middleboxes are involved into the session. The security parameters such as the version, ciphersuite, and extensions are determined by the server among the "intersection" of the security parameters that all the entities support.
+						  <h4>&#9656 The segment is incrementally generated and finally the session is generated in the bottom-up approach</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; In the bottom-up approach, the segment is incrementally generated and appended to the prior segments. Finally, the segments compose the session between the client and the server. In this case, each segment negotiates its own security parameters without any restrictions from other segments.
 					</div>
 				</div>
 			</div>
 
 			<hr />
 
-      <h3>Confidentiality</h3>
+      <h3>Limitations of Top-down</h3>
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+						<h4>&#9656 The top-down approach requires all the entities support the TLS extension</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp; Because the server determines the extensions among the intersection of the extensions that the entities in the session support, the TLS extension can be used when all the entities support the protocol. There is one scheme that allows the protocol can be partially used (e.g., only in the client side), but the scheme requires for the endpoints to generate all the segment keys, which seems inefficient.
+						<h4>&#9656 The top-down approach restricts the negotiated ciphersuite</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp; Because the server determines the extensions among the intersection of the extensions that the entities in the session support, the negitiated TLS version and ciphersuite will be in the intersection of the versions and ciphersuites. For example, if any of the entities does not support TLS 1.3, the session cannot benefit from TLS 1.3 until all the entities support the TLS 1.3 protocol.
 					</div>
 					<div class="col-md-4">
 						An image will be inserted
@@ -143,20 +156,133 @@
 
 			<hr />
 
-      <h3>Integrity</h3>
+      <h3>Advantages of Bottom-up</h3>
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-4">
 						An image will be inserted
 					</div>
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+						  <h4>&#9656 The bottom-up approach allows incremental deployment, intrinsically</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Because the extension is determined on segment basis, the maTLS session can be partially established. For example, if there are the client and the proxy that support maTLS, and the server that does not support maTLS, the maTLS session can be estabished between the client and the proxy and the standard TLS session is established between the proxy and the server. In this case, not all the security goals of maTLS are achieved but the client can be aware of the proxy with a increased level of the security than SplitTLS.
+						  <h4>&#9656 The bottom-up approach allows flexible selection of security parameters</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Because the TLS version and the ciphersuite is determined on segment basis, some segments can benefit from a newer/stronger version or ciphersuites even if all the entity do not support them.
 					</div>
 
 				</div>
 			</div>
     </div>
+
+		<div class="background-white">
+			<div id="introduction" class="container">
+				<h2>Audit Mechanisms</h2>
+        <p class="lead">We devise three audit mechanisms to achieve seven goals in maTLS</p>
+      <hr />
+      <h3>Explicit authentication</h3>
+
+      <div class="row">
+        <div class="col-md-4">
+          An image will be inserted
+        </div>
+        <div class="col-md-8">
+          <h4>&#9656 Explicit authentication means the client confirms all the entities with their own certificates</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client can be aware of all the entities in the session with the help of a series of the entities' certificate and the corresponding SCTs, which guarantees server authentication as well as middlebox authentication.
+        
+          <h4>&#9656 Explicit authentication guarantees the extended validation certificate not to be degraded because of forgery</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The extended validation (EV) certificate of the server is degraded to the domain validation certificate by the forged certificate or the shared certificate by the middlebox in SplitTLS. WIth the explicit authentication, the EV certificates are directly delivered to the client, so the server does not worry of the degradation.
+
+          <h4>&#9656 Explicit authentication supports validating and auditing certificate schemes such as CT and DANE</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Because all the certificates are not forged, explicit authentication is compatible with CT or DANE. The client can check whether the certificates are logged in the log servers and verify the certificates with DANE, which are impossible with forged certificates.
+        </div>
+      </div>
+      <hr />
+
+      <h3>Security parameter verification</h3>
+				<div class="row">
+					<div class="col-md-8">
+					    <h4>&#9656 The client confirms the security level of all the segments by the information about the segment, reported by all the entities</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; All the entities report the information about their related segment, called security parameter blocks, to the client. The security parameter blocks include a negotiated TLS version, a selected ciphersuite, a transcript of a handshake, and a hash value of the master secret. Note that the information about each segment is reported twice by the related two entities for cross checking. This aims to reduce a chance of any mis-behavior in reporting.
+					  <h4>&#9656 Security parameter verification guarantees segment secrecy</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client confirms all the TLS versions and ciphersuites selected in all the segments. The client can determine to accept or decline the session based on the information, which guarantees segment secrecy.
+
+					  <h4>&#9656 Security parameter verification guarantees individual secrecy</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client receives transcripts of handshakes in segments and hash values of master secrets. A transcript shows the two entities "establish" the segment key. The different hash values of the master secrets imply different segment keys are established in the session, which guarantees individual secrecy.
+
+					</div>
+					<div class="col-md-4">
+            An image will be inserted
+					</div>
+				</div>
+
+      <h3>Valid modification checks</h3>
+				<div class="row">
+					<div class="col-md-8">
+					  <h4>&#9656 Valid modification checks become feasible with the help of modification log blocks</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The entities in the session leave their own HMAC of the input/output messages. Specifically, the entities generate modification log blocks including the identifier of the entity, the hash value of the received message, and the HMAC of the input/output messages. The keys used to generate HMACs are called accountability keys.
+
+					  <h4>&#9656 Valid modification checks guarantee data source authentication</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When an entity sends the initial message, it generates the source MAC that consists of the identifier of the data source and an HMAC on the message. This helps the client to confirm the source of the received message.
+
+					  <h4>&#9656 Valid modification checks ensure modification accountability</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When an entity modifies the message from m to m', it generates the modification MAC that consists of the identifier of the writer, H(m), and HMAC(H(m') || H(m)), where a||b means the concatenation of a and b. This helps the client to confirm the write operation of the middlebox. For a reader (i.e., the middlebox that simply reads the message but not modifies it), it simply leaves HMAC over the prior HMAC to show it reads the message.
+
+					  <h4>&#9656 Valid modification checks support path integrity</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Since all the entities leave their own HMAC, the client receives the message with related HMACs in an order. The client can confirm whether the order is intended.
+
+					</div>
+					<div class="col-md-4">
+            An image will be inserted
+					</div>
+				</div>
+			</div>	
+		</div>	
+
+		<div id="problems" class="container">
+			<h2>Middlebox-aware TLS Extension</h2>
+				<p class="lead">We design the maTLS TLS extension based on our bottom-up approach and three audit mechanisms</p>
+			<hr />
+
+      <h3>The maTLS handshake protocol</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+					<div class="col-md-8">
+						<h4>&#9656 ClientHello and ServerHello</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; During the Hello messages, the usage for the maTLS protocol is negotiated across the session. Further, the TLS version and the ciphersuite are selected on segment basis.
+						<h4>&#9656 Certificate</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; In the Certificate message, all the entities include their own certificates with the corresponding SCTs in the message. The client performs explicit authentication in this step.
+
+						<h4>&#9656 ClientKeyExchange and ServerKeyExchange</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The segment keys are established in this step.
+
+						<h4>&#9656 Finished</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Each pair of entities in the segment exchanges the transcript of the handshake in the segment to confirm no attacker is involved during handshake.
+
+						<h4>&#9656 ExtendedFinished</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; We add one more message called the ExtendedFinished message after Finished message. The message includes all the security parameter blocks and the client finally performs security parameter verification.
+
+					</div>
+				</div>
+			</div>
+
+			<hr />
+
+      <h3>The maTLS record protocol</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-8">
+						<h4>&#9656 Messages with a Modification Log</h4>
+            &nbsp;&nbsp;&nbsp;&nbsp; All the entities appends their own modification log block to the received modification log. The endpoints perform valid modification checks whenever they receive the message.
+					</div>
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+				</div>
+			</div>
+    </div>
+
   </div>
 </body>
 </html>

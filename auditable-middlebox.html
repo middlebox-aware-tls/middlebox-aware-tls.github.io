@@ -66,97 +66,78 @@
 
 		<div class="background-white">
 			<div id="introduction" class="container">
-				<h2>Introduction</h2>
-        <p class="lead">In general, TLS cannot be compatible with middleboxes,<br> 
-        since the TLS protocol prohibits man-in-the-middle attacks</p>
+				<h2>Auditable Middleboxes</h2>
+        <p class="lead">An auditable middlebox is a middlebox that has its own certificate logged in the middlebox transparency system</p>
       <hr />
-      <h3>TLS with Middleboxes</h3>
-
+      
+      <h3>Middlebox Certificates</h3>
       <div class="row">
         <div class="col-md-4">
           An image will be inserted
         </div>
         <div class="col-md-8">
-          <h4>&#9656 Middleboxes are widely used</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes such as anti-virus software and a firewall are widely used to enhance security and performance in networking.
-        
-          <h4>&#9656 TLS does not allow a man-in-the-middle</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;TLS is an end-to-end security protocol; thus, TLS does not permit middleboxes to be involved in the session.
+          <h4>&#9656 A client is not aware of involved middleboxes</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;To minigate the problems in SplitTLS, it is desirable to make middleboxes visible and publicly auditable.
 
-          <h4>&#9656 Middleboxes cannot be used with TLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes that should read application data become dumb with TLS.
+          <h4>&#9656 X.509 certificates are relevant to make middleboxes public</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;X.509 certificates are public and static; thus, it is appropriate to describe the properties of the middleboxes.
         </div>
       </div>
-
       <hr />
 
-      <h3>SplitTLS is risky</h3>
+      <h3>Fields of Middlebox Certificates</h3>
+      <div class="row">
+        <div class="col-md-8">
+          <h4>&#9656 Type of Service</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;This field describes the type of the service provided by the middlebox. Examples are web application firewalls, anti-virus software, and parental filterings.
+        
+          <h4>&#9656 URL</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;This field indicates the URL pointing to the web page of information about the middlebox or the middlebox service provider.
+
+          <h4>&#9656 Permission</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;This field represents the permission of the middlebox, e.g., read or write.
+        </div>
+        <div class="col-md-4">
+          An image will be inserted
+        </div>
+      </div>
+      <hr />
+
+      <h3>Middlebox Transparency</h3>
+			<div class="row">
+				<div class="col-md-4">
+          An image will be inserted
+				</div>
+				<div class="col-md-8">
+					<h4>&#9656 The middlebox transparency system records all the middlebox certificates</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;The middlebox transparency log server manages the middlebox certificates in the form of a merkle tree
+					<h4>&#9656 The middlebox transparency system issues a signed certificate timestamp</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;The signed certificate timestamp (SCT) represents a promise that the corresponding certificate will be logged in the log server within the next period as the certificate transparency (CT) system does.
+				</div>
+			</div>
+      <hr />
+
+      <h3>Advantages</h3>
 				<div class="row">
-					<div class="col-md-8">
-					    <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
 					<div class="col-md-4">
             An image will be inserted
 					</div>
+					<div class="col-md-8">
+					    <h4>&#9656 No impersonation</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes now have their own key pairs and do not need to impersonate others (in TLS).
+					    <h4>&#9656 Awareness</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Anyone can know the name and the properties of the middlebox by the middlebox certificate.
+					    <h4>&#9656 Auditability</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Any interested parties can check fraudulent certificates with the middlebox transparency system.
+					    <h4>&#9656 Information Enforcement</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;A CA can enforce middlebox service providers to provide sufficient information about the middleboxes by marking important fields as "critical"; the client should abort the session if the critical field is not filled.
+					    <h4>&#9656 Revocability</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;Any incorrect middleboxes can be blocked following the certificate revocation mechanisms such as CRL or OCSP.
+					</div>
 				</div>
-			</div>	
+			</div>
+
 		</div>	
-		
-		<div id="problems" class="container">
-			<h2>Problems</h2>
-				<p class="lead">
-					The current TLS-interception scheme (a.k.a. SplitTLS) is risky in terms of authentication, confidentiality, and integrity, which are guaranteed by the TLS protocol
-				</p>
-
-			<hr />
-
-      <h3>Authentication</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-					<div class="col-md-8">
-						  <h4>&#9656 Authentication is a process to confirm the identity of the other point</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-						  <h4>&#9656 Clients cannot authenticate servers with SplitTLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-					</div>
-				</div>
-			</div>
-
-			<hr />
-
-      <h3>Confidentiality</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-				</div>
-			</div>
-
-			<hr />
-
-      <h3>Integrity</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-
-				</div>
-			</div>
-    </div>
   </div>
 </body>
 </html>

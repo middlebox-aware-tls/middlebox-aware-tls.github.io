@@ -65,97 +65,61 @@
 		</div>
 
 		<div class="background-white">
-			<div id="introduction" class="container">
-				<h2>Introduction</h2>
-        <p class="lead">In general, TLS cannot be compatible with middleboxes,<br> 
-        since the TLS protocol prohibits man-in-the-middle attacks</p>
+			<div id="evaluation" class="container">
+				<h2>Evaluation</h2>
+        <p class="lead">We evaluated the overhead incurred by the maTLS protocol</p>
       <hr />
-      <h3>TLS with Middleboxes</h3>
 
+      <h3>Evaluation Settings</h3>
       <div class="row">
         <div class="col-md-4">
           An image will be inserted
         </div>
         <div class="col-md-8">
-          <h4>&#9656 Middleboxes are widely used</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes such as anti-virus software and a firewall are widely used to enhance security and performance in networking.
+          <h4>&#9656 Implementation</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; We implement the maTLS protocol with OpenSSL and the simple applications in C for evaluation. A client application performs the maTLS handshake with the middleboxes and the server. Then, the client sends an HTTP GET request message and finally receives an HTTP RESPONSE message from the server (or the middlebox). A server application executes the maTLS handshake with the client and the middleboxes, receives the HTTP request message, and response with the HTTP RESPONSE. A middlebox application simply executes the maTLS protocol with the client-side entity, reads the SNI field to know the intended server from the received ClientHello, and performs another maTLS handshake with the server-side entity. After the session is established, the middlebox simply forwards the received message from one side to the other side.
         
-          <h4>&#9656 TLS does not allow a man-in-the-middle</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;TLS is an end-to-end security protocol; thus, TLS does not permit middleboxes to be involved in the session.
-
-          <h4>&#9656 Middleboxes cannot be used with TLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes that should read application data become dumb with TLS.
+          <h4>&#9656 Testbed</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;We set three different scenarios according to the place where the server and the server-side middlebox are located. The three scenarios are an intra-country, an intra-region, and an inter-region scenarios. The client and the client-side middlebox are located in Seoul National University in Korea in three scenarios. In the intra-country scenario, the server and the server-side middlebox are located in the AWS Seoul data center in Korea. In the intra-region scenario, the server and the server-side middlebox are situated in the AWS Tokyo data center in Japan. In the inter-region scenario, the server and the server-side middleboxes are in the AWS Virginia data center in USA.
         </div>
       </div>
 
-      <hr />
+      <h3>Delay Time</h3>
+      <div class="row">
+        <div class="col-md-4">
+          An image will be inserted
+        </div>
+        <div class="col-md-8">
+          <h4>&#9656 HTTP Page Load Time result shows the maTLS protocol incurs a slight delay compared with the SplitTLS protocol and the mcTLS protocol</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;The maTLS protocol incurs delay time from 10.22ms to 32.52ms, compared with the SplitTLS protocol and the mcTLS protocol.
+        
+          <h4>&#9656 Most of delay time is due to a initial setup of the maTLS session</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;When we measured the delay time for data exchange after the session is established, three schemes show similar result. This means that most of delay time of the maTLS protocol is due to an initial setup of the session. We conclude that once the session is established, maTLS provides similar performance to the others while preserving all security merits that we have discussed.
+        </div>
+      </div>
 
-      <h3>SplitTLS is risky</h3>
-				<div class="row">
-					<div class="col-md-8">
-					    <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-					<div class="col-md-4">
-            An image will be inserted
-					</div>
-				</div>
-			</div>	
-		</div>	
-		
-		<div id="problems" class="container">
-			<h2>Problems</h2>
-				<p class="lead">
-					The current TLS-interception scheme (a.k.a. SplitTLS) is risky in terms of authentication, confidentiality, and integrity, which are guaranteed by the TLS protocol
-				</p>
+      <h3>Scalability of Audit Mechanisms</h3>
+      <div class="row">
+        <div class="col-md-4">
+          An image will be inserted
+        </div>
+        <div class="col-md-8">
+          <h4>&#9656 The overhead of the three audit mechanisms with regard to the number of middleboxes is almost negligible.</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;The overhead increases linearly with the number of middleboxes but the increments are marginal. For example, only an extra 0.045ms and 0.063ms overhead are required for the explicit authentication and security parameter verification, respectively. Note that only 0.026ms is needed for valid modification checks, even with 8 middleboxes.
+        </div>
+      </div>
 
-			<hr />
+      <h3>CPU Processing Time</h3>
+      <div class="row">
+        <div class="col-md-4">
+          An image will be inserted
+        </div>
+        <div class="col-md-8">
+          <h4>&#9656 CPU Processing Time is also marginal</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp;In the server's perspective, the CPU processing time is also increased linearly, but the increment is marginal. The increment was only 0.398ms per a middlebox.
+        </div>
+      </div>
 
-      <h3>Authentication</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-					<div class="col-md-8">
-						  <h4>&#9656 Authentication is a process to confirm the identity of the other point</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-						  <h4>&#9656 Clients cannot authenticate servers with SplitTLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-					</div>
-				</div>
-			</div>
-
-			<hr />
-
-      <h3>Confidentiality</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-				</div>
-			</div>
-
-			<hr />
-
-      <h3>Integrity</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-
-				</div>
-			</div>
     </div>
   </div>
 </body>

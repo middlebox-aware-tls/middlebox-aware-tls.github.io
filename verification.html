@@ -65,97 +65,148 @@
 		</div>
 
 		<div class="background-white">
-			<div id="introduction" class="container">
-				<h2>Introduction</h2>
-        <p class="lead">In general, TLS cannot be compatible with middleboxes,<br> 
-        since the TLS protocol prohibits man-in-the-middle attacks</p>
+			<div id="verification" class="container">
+        <h2>Tamarin Overview</h2>
+        <p class="lead">We verify the security of the maTLS protocol with the help of Tamarin</p>
       <hr />
-      <h3>TLS with Middleboxes</h3>
+      <h3>Tamarin</h3>
 
       <div class="row">
         <div class="col-md-4">
           An image will be inserted
         </div>
         <div class="col-md-8">
-          <h4>&#9656 Middleboxes are widely used</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes such as anti-virus software and a firewall are widely used to enhance security and performance in networking.
+          <h4>&#9656 Tamarin is built upon a multiset rewriting model</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; Tamarin is based on a state-transition model defined by a <em>state</em> that consists of a multiset of <em>facts</em>and a <em>rule</em> that changes one state to another state. A particular fact can trigger several rules so one fact can make several branch. A list of transitions are called <em>trace</em>. The properties to be proved on trace are called <em>lemmas</em> that are in the form of the first-order logic formulae. If a formula is violated, Tamarin generates a graph showing a trace that leads to the contradicting state. 
         
-          <h4>&#9656 TLS does not allow a man-in-the-middle</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;TLS is an end-to-end security protocol; thus, TLS does not permit middleboxes to be involved in the session.
+          <h4>&#9656 Tamarin assumes the Dolev-Yao adversary</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; In the Tamarin execution model, all the messages are sent to the network adversary. This captures the passive adversary who can read all the messages in the network.
 
-          <h4>&#9656 Middleboxes cannot be used with TLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Middleboxes that should read application data become dumb with TLS.
+          <h4>&#9656 Our impentation can be found in the public repository</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The full Tamarin implementation can be found at <a href="https://github.com/middlebox-aware-tls/matls-tamrin.git">https://github.com/middlebox-aware-tls/matls-tamarin.git</a>. 
+
         </div>
       </div>
+    </div>
 
-      <hr />
-
-      <h3>SplitTLS is risky</h3>
-				<div class="row">
-					<div class="col-md-8">
-					    <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
-					</div>
-					<div class="col-md-4">
-            An image will be inserted
-					</div>
-				</div>
-			</div>	
-		</div>	
-		
 		<div id="problems" class="container">
-			<h2>Problems</h2>
+			<h2>Lemmas</h2>
 				<p class="lead">
-					The current TLS-interception scheme (a.k.a. SplitTLS) is risky in terms of authentication, confidentiality, and integrity, which are guaranteed by the TLS protocol
+				  Our seven goals are described in the first order logic to be proved in Tamarin	
 				</p>
-
 			<hr />
 
-      <h3>Authentication</h3>
-			<div class="experiences">
-				<div class="experience row">
-					<div class="col-md-4">
-						An image will be inserted
-					</div>
-					<div class="col-md-8">
-						  <h4>&#9656 Authentication is a process to confirm the identity of the other point</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-						  <h4>&#9656 Clients cannot authenticate servers with SplitTLS</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;Generally, the client authenticates the server to confirm the server is intended. This prevents the attacker from being involved into the session.
-					</div>
-				</div>
-			</div>
-
-			<hr />
-
-      <h3>Confidentiality</h3>
+      <h3>Server Authentication</h3>
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+						<h4>&#9656 Desciption</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When a client believes she has finished an maTLS handshake, the corresponding server also believes he has established a session with the client, sharing the same accountability key data.
+						<h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For a client (C), a server (S), and nonces (nonces), when the handshake in the client's perspective is completed at the time <em>tc</em>, there exists a time <em>ts</em> (before <em>tc</em>) that the server finished the handshake with the client sharing the same nonces, leading to the accountability key.
 					</div>
 					<div class="col-md-4">
 						An image will be inserted
 					</div>
 				</div>
 			</div>
-
 			<hr />
 
-      <h3>Integrity</h3>
+      <h3>Middlebox Authentication</h3>
 			<div class="experiences">
 				<div class="experience row">
 					<div class="col-md-4">
 						An image will be inserted
 					</div>
 					<div class="col-md-8">
-						  <h4>&#9656 Middleboxes perform man-in-the-middle attacks</h4>
-          &nbsp;&nbsp;&nbsp;&nbsp;To utilize functionalities of middleboxes, the current approach splits the TLS session.
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When the client confirms a middlebox as part of the handshake, the client shares accountability key data with them.
+						  <h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For a client (C), a middlebox (MB), and nonces (nonces), when the handshake in the client's perspective is completed at the time <em>tc</em>, there exists a time <em>tmb</em> (before <em>tc</em>) that the middlebox finished the handshake with the client sharing the same nonces, leading to the accountability key.
 					</div>
-
 				</div>
 			</div>
+			<hr />
+
+      <h3>Segment Secrecy</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-8">
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When the maTLS session is established, a client correctly verifies the security parameters used in each segment.
+						  <h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For a client (C), a middlebox (MB), a server (S), nonces (nonces), and security parameters (params), when a client performs security parameter verificationwith params at <em>tc</em> and finishes the handshake at <em>tcomplete</em>, there exist entities that sent the corresponding security parameters to the client at <em>tmb</em> (before <em>tc</em>). 
+					</div>
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+				</div>
+			</div>
+			<hr />
+
+      <h3>Individual Secrecy</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+					<div class="col-md-8">
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; At the end of an maTLS handshake, each segment has established distinct TLS keys.
+						  <h4>&#9656 Formulae</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; For a client (c), a server (S), and nonces (nonces), when a client finishes a handshake, a keyA established between a1 and a2 and a keyB established between b1 and b2 is different. Otherwise, a1 and b1, a2 and b2 are identical, respectively.
+					</div>
+				</div>
+			</div>
+			<hr />
+
+      <h3>Data Source Authentication</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-8">
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When a client receives a message from the server during the maTLS record phase, the hash value from the server is a faithful digest of the original message.
+						  <h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For a client (C), a server (S), nonces (nonces), a request (req), and a response (resp), when a client receives a message and believes it is from a server at time <em>trecv</em>, there exists a time <em>tresp</em> that the server sends a response to the client.<br> (Note that a server can be interchangeable with a middlebox in this formulae since there can be a middlebox such as a web cache that generates a message. Here, we just use a server for brevity.)
+					</div>
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+				</div>
+			</div>
+			<hr />
+
+      <h3>Modification Accountability</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+					<div class="col-md-8">
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; When a client receives a message during the maTLS record phase, the client believes that a middlebox has changed the message if and only if that middlebox did make a change.
+						  <h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For a client (C), a server (S), nonces (nonces), and a request (req), when a client receives a response to a request at the time <em>trecv</em>, there exists the time <em>tmb</em> that a middlebox modifies the message from <em>before</em> to <em>after</em> and the time <em>tc</em> that a client checks the modification. Note that <em>tmb</em> should be earlier than <em>tc</em> and <em>tc</em> should be earlier than or equal to <em>trecv</em>.
+					</div>
+				</div>
+			</div>
+			<hr />
+
+      <h3>Path Integrity</h3>
+			<div class="experiences">
+				<div class="experience row">
+					<div class="col-md-8">
+						  <h4>&#9656 Description</h4>
+          &nbsp;&nbsp;&nbsp;&nbsp; The client knows the order of the intermediate middleboxes in an maTLS session. Messages will always travel in this order.
+						  <h4>&#9656 Formulae</h4>
+              &nbsp;&nbsp;&nbsp;&nbsp; For agents (a1, a2, a3) and nonces (nonces), when the path is established in the order that a1 is followed by a2 at <em>ta</em> and a2 is followed by a3 at <em>tb</em>, if a2 forwards the message to a3 at <em>tf</em>, there exists the time <em>tp</em> before <em>tf</em> when a1 forwards the message to a2.
+					</div>
+					<div class="col-md-4">
+						An image will be inserted
+					</div>
+				</div>
+			</div>
+
     </div>
   </div>
 </body>
